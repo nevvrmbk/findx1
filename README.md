@@ -4,5 +4,5 @@
 - Express JS
 - Typescript
 - Prisma
-- Mozilla Nunjucks
+- [Mozilla Nunjucks](https://mozilla.github.io/nunjucks/)
 
