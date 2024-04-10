@@ -1,0 +1,27 @@
+{% extends "layout.njk" %}
+
+{% block header %}
+<h1>Home Page</h1>
+{% endblock %}
+
+{% block body %}
+Search for People and / or Services
+Hello + {{ name }}
+
+<section>
+    <h2>Upload Files</h2>
+    <form action="/" method="post" enctype="multipart/form-data">
+        <input name="files" type="file" multiple />
+        <input type="submit" value="Upload" />
+    </form>
+    {% if (files) %}
+    {% for file in files %}
+    <p>{{ file.filename }}</p>
+    {% endfor %}
+    {% endif %}
+</section>
+{% endblock %}
+
+{% block footer %}
+{{ super() }}
+{% endblock %}

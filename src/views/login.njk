@@ -1,0 +1,21 @@
+{% extends "layout.njk" %}
+
+{% block header %}
+<h1>Login Page</h1>
+{% endblock %}
+
+{% block body %}
+{# Signin using email and password #}
+<section class="container">
+    <h2>Login Form</h2>
+    <form action="/login" method="post">
+        <input type="email" name="email" placeholder="Email" />
+        <input type="password" name="password" placeholder="Password" />
+        <input type="submit" name="submit" value="Login" />
+    </form>
+</section>
+{% endblock %}
+
+{% block footer %}
+{{ super() }}
+{% endblock %}
