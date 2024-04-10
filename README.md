@@ -3,6 +3,6 @@
 ## Tech stack
 - Express JS
 - Typescript
-- Prisma
+- [Prisma](https://prisma.io)
 - [Mozilla Nunjucks](https://mozilla.github.io/nunjucks/)
 
