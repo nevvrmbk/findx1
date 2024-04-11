@@ -9,9 +9,19 @@
 <section class="container">
     <h2>Login Form</h2>
     <form action="/login" method="post">
-        <input type="email" name="email" placeholder="Email" />
-        <input type="password" name="password" placeholder="Password" />
-        <input type="submit" name="submit" value="Login" />
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" id="email" class="form-control is-valid" name="email" placeholder="Email" />
+            <small class="valid-feedback">Looks good!</small>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" id="password" class="form-control is-invalid" name="password" placeholder="Password" />
+            <small class="invalid-feedback">Password field is required.</small>
+        </div>
+        <div class="mb-3">
+            <input type="submit" class="form-control" class="btn btn-dark btn-outline-info" name="submit" value="Login" />
+        </div>
     </form>
 </section>
 {% endblock %}

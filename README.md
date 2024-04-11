@@ -9,4 +9,5 @@
 ---
 ## Setting up the database for development
 ```bash
+echo "DATABASE_URL='file:./dev.db'" > .env
 npx prisma migrate dev --name init
