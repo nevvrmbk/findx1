@@ -75,9 +75,6 @@ const protectedUnauthenticatedRoute = (req: Request, res: Response, next: NextFu
     }
     return res.redirect("/");
 };
-const protectedRoute = (req: Request, res: Response, next: NextFunction) => {
-    if (req.isAuthenticated()) {}
-};
 
 app.use(flash());
 app.use((req: Request, res: Response, next: NextFunction) => {

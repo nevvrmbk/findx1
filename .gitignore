@@ -5,3 +5,4 @@ uploads
 prisma/migrations
 *.db
 sessions
+*.log
