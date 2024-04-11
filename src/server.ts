@@ -10,10 +10,13 @@ import multer from "multer";
 const Store = require("connect-sqlite3")(session);
 import { join } from "path";
 import { nextTick } from "process";
+import { createWriteStream } from "node:fs";
+import morgan from "morgan";
 import 'dotenv/config';
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
+const hostname = process.env.HOSTNAME || "0.0.0.0";
 const SECRET = process.env.SECRET || "a super secret secret";
 const viewsDir = join(__dirname, "views");
 const prisma = new PrismaClient();
@@ -36,6 +39,9 @@ const uploads = multer({
 app.use(express.json());
 app.use(express.urlencoded({ extended: false, }));
 app.use(session({ secret: SECRET, resave: true, saveUninitialized: false, store: new Store, }));
+
+app.use(morgan("dev"));
+app.use(morgan("combined", { stream: createWriteStream("log.log"), }))
 
 passport.use("local", new Strategy({ usernameField: "email" }, (email, password, done) => {
     nextTick(async () => {
@@ -63,6 +69,15 @@ const protectedAuthenticatedRoute = (req: Request, res: Response, next: NextFunc
     req.flash("message", "Please login to view that resource.");
     return res.redirect(302, "/login");
 }
+const protectedUnauthenticatedRoute = (req: Request, res: Response, next: NextFunction) => {
+    if (req.isUnauthenticated()) {
+        return next();
+    }
+    return res.redirect("/");
+};
+const protectedRoute = (req: Request, res: Response, next: NextFunction) => {
+    if (req.isAuthenticated()) {}
+};
 
 app.use(flash());
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -84,8 +99,8 @@ app.post("/", [protectedAuthenticatedRoute, body("files").exists().notEmpty().wi
     return res.render("index.njk", { files });
 });
 
-app.get("/register", (req: Request, res: Response) => res.render("register.njk"));
-app.post("/register", [body(["firstName", "lastName", "username", "phoneNumber"]).exists().withMessage("Empty Fields!"), body("email").exists().withMessage("Email Field is Required").isEmail().withMessage("Invalid Input.").escape(), body("password").exists().withMessage("Password Field is Required.")], async (req: Request, res: Response) => {
+app.get("/register", [protectedUnauthenticatedRoute], (req: Request, res: Response) => res.render("register.njk"));
+app.post("/register", [protectedUnauthenticatedRoute, body(["firstName", "lastName", "username", "phoneNumber"]).exists().withMessage("Empty Fields!"), body("email").exists().withMessage("Email Field is Required").isEmail().withMessage("Invalid Input.").escape(), body("password").exists().withMessage("Password Field is Required.")], async (req: Request, res: Response) => {
     const vr = validationResult(req);
     if (!vr.isEmpty()) {
         const errors = vr.array({ onlyFirstError: true, });
@@ -101,8 +116,8 @@ app.post("/register", [body(["firstName", "lastName", "username", "phoneNumber"]
     return res.render("register.njk");
 });
 
-app.get("/login", (req: Request, res: Response) => res.render("login.njk"));
-app.post("/login", [body("email").exists().withMessage("Email Field is Required").isEmail().withMessage("Invalid Input.").escape(), body("password").exists().withMessage("Password Field is Required."), passport.authenticate("local", { failureFlash: true, failureMessage: "Invalid email or password.", failureRedirect: "back", failWithError: true, successFlash: true, successMessage: "Successfully logged in.", successRedirect: "/", })], (req: Request<{}, {}, { email: string, password: string, }, {}>, res: Response) => {
+app.get("/login", [protectedUnauthenticatedRoute,], (req: Request, res: Response) => res.render("login.njk"));
+app.post("/login", [protectedUnauthenticatedRoute, body("email").exists().withMessage("Email Field is Required").isEmail().withMessage("Invalid Input.").escape(), body("password").exists().withMessage("Password Field is Required."), passport.authenticate("local", { failureFlash: true, failureMessage: "Invalid email or password.", failureRedirect: "back", failWithError: true, successFlash: true, successMessage: "Successfully logged in.", successRedirect: "/", })], (req: Request<{}, {}, { email: string, password: string, }, {}>, res: Response) => {
     return res.render("login.njk");
 });
 
@@ -112,4 +127,4 @@ app.get("/logout", [protectedAuthenticatedRoute,], (req: Request, res: Response)
     return res.redirect("/login");
 });
 
-app.listen(port, () => console.log(`Server started on http://127.0.0.1:${port}`));
+app.listen(port, hostname, () => console.log(`Server started on http://${hostname}:${port}`));
